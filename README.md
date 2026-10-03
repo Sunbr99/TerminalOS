@@ -110,7 +110,8 @@ TerminalOS/
 │   └── process_files.sh
 ├── tests/
 │   └── shell_test.go
-└── LICENSE
+├── LICENSE
+└── README.md
 ```
 
 ## Example Scripts
