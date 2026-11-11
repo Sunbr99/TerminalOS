@@ -1,8 +1,8 @@
 package library
 
 import (
-    "fmt"
-    "strings"
+	"fmt"
+	"strings"
 )
 
 type HelloPlugin struct{}
@@ -10,10 +10,10 @@ type HelloPlugin struct{}
 func (p *HelloPlugin) Name() string { return "hello" }
 
 func (p *HelloPlugin) Run(args []string) error {
-    if len(args) == 0 {
-        fmt.Println("Hello from TerminalOS")
-        return nil
-    }
-    fmt.Printf("Hello %s\n", strings.Join(args, " "))
-    return nil
+	if len(args) == 0 {
+		fmt.Println("Hello from TerminalOS")
+		return nil
+	}
+	fmt.Printf("Hello %s\n", strings.Join(args, " "))
+	return nil
 }
