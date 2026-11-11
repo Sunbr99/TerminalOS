@@ -1,0 +1,17 @@
+{
+  "security": {
+    "mode": "local_only",
+    "firewall": {
+      "enabled": true,
+      "default_policy": "deny",
+      "allowed_ips": ["127.0.0.1", "::1"]
+    },
+    "honeypot": {
+      "enabled": true,
+      "port": 2222
+    },
+    "logger": {
+      "enabled": true
+    }
+  }
+}
