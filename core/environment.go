@@ -108,17 +108,22 @@ func tokenize(input string) []string {
 	var current strings.Builder
 	var quote rune
 	escaped := false
+	tokenStarted := false
 
 	flush := func() {
-		if current.Len() > 0 {
+		if tokenStarted {
 			tokens = append(tokens, current.String())
 			current.Reset()
+			tokenStarted = false
 		}
 	}
 
-	for _, r := range input {
+	runes := []rune(input)
+	for i := 0; i < len(runes); i++ {
+		r := runes[i]
 		if escaped {
 			current.WriteRune(r)
+			tokenStarted = true
 			escaped = false
 			continue
 		}
@@ -126,6 +131,7 @@ func tokenize(input string) []string {
 		if r == '\\' {
 			if quote == '\'' {
 				current.WriteRune(r)
+				tokenStarted = true
 				continue
 			}
 			escaped = true
@@ -138,6 +144,7 @@ func tokenize(input string) []string {
 				continue
 			}
 			current.WriteRune(r)
+			tokenStarted = true
 			continue
 		}
 
@@ -146,38 +153,37 @@ func tokenize(input string) []string {
 			flush()
 		case r == '\'', r == '"':
 			quote = r
+			tokenStarted = true
 		case r == '|':
 			flush()
 			tokens = append(tokens, "|")
+		case r == '2' && i+1 < len(runes) && runes[i+1] == '>':
+			flush()
+			i++
+			operator := "2>"
+			if i+1 < len(runes) && runes[i+1] == '>' {
+				operator = "2>>"
+				i++
+			}
+			tokens = append(tokens, operator)
 		case r == '>':
 			flush()
-			if strings.HasPrefix(input[current.String() != ""], ">>") {
-				// not used; logic handled below when tokenized by scanning index
+			operator := ">"
+			if i+1 < len(runes) && runes[i+1] == '>' {
+				operator = ">>"
+				i++
 			}
-			tokens = append(tokens, ">")
+			tokens = append(tokens, operator)
 		default:
 			current.WriteRune(r)
+			tokenStarted = true
 		}
 	}
 
+	if escaped {
+		current.WriteRune('\\')
+		tokenStarted = true
+	}
 	flush()
-	return normalizeTokens(tokens)
-}
-
-func normalizeTokens(tokens []string) []string {
-	output := make([]string, 0, len(tokens))
-	for i := 0; i < len(tokens); i++ {
-		token := tokens[i]
-		if token == ">" {
-			if i+1 < len(tokens) && tokens[i+1] != "|" {
-				output = append(output, ">")
-				continue
-			}
-		}
-		if token == "" {
-			continue
-		}
-		output = append(output, token)
-	}
-	return output
+	return tokens
 }

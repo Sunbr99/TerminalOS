@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"sort"
 	"strings"
 
@@ -70,7 +71,7 @@ func NewShellEngine(cfg config.Config) *ShellEngine {
 		return commands.Exit(args, env)
 	})
 	shell.RegisterBuiltin("history", func(args []string, env *Environment, shell *ShellEngine) error {
-		return commands.History(args, shell)
+		return commands.History(args, shell.History)
 	})
 
 	shell.Registry.Register(&library.HelloPlugin{})
@@ -144,10 +145,6 @@ func (s *ShellEngine) runExternal(cmd Command) error {
 	if cmd.Name == "" {
 		return nil
 	}
-
-	argv := make([]string, 0, len(cmd.Args)+1)
-	argv = append(argv, cmd.Name)
-	argv = append(argv, cmd.Args...)
 
 	execCmd := execCommand(cmd.Name, cmd.Args...)
 	execCmd.Dir = s.Env.CurrentDir
